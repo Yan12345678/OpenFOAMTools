@@ -1,0 +1,66 @@
+//pisoFoam.C
+/******************************************************************************/
+#include "fvCFD.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+int main(int argc, char *argv[])
+{
+
+    #include "setRootCaseLists.H"
+    #include "createTime.H"
+    #include "createMesh.H"
+
+
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+    #include "calculateArea.H"
+
+    Info<< "End\n" << endl;
+
+    return 0;
+}
+
+//calculateArea.H
+/****************************************************************************/
+const fvPatchList& patches = mesh.boundary();
+const surfaceScalarField& magSf = mesh.magSf();
+// const fvPatchList& patchIDs = mesh.boundaryMesh().patches();
+forAll(patches, patchID)
+{
+ 	//const polyPatch& cPatch = mesh.boundaryMesh()[patchID];
+ 	scalar AREA = gSum(magSf.boundaryField()[patchID]);
+ 	const fvPatch& curPatch = patches[patchID];
+	Info << "AREA of " << curPatch.name() << " is " << AREA << endl;	
+} 				
+
+//Make/options
+/******************************************************************************/
+EXE_INC = \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/incompressible/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+
+EXE_LIBS = \
+    -lturbulenceModels \
+    -lincompressibleTurbulenceModels \
+    -lincompressibleTransportModels \
+    -lfiniteVolume \
+    -lfvOptions \
+    -lsampling \
+    -ldynamicFvMesh \
+    -ltopoChangerFvMesh \
+    -ldynamicMesh \
+    -lmeshTools
+
+//Make/files
+/*********************************************************************************/
+pisoFoam.C
+EXE = $(FOAM_APPBIN)/calculateArea
